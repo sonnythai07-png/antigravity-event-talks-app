@@ -10,6 +10,7 @@ let lastSyncedTime = null;
 // DOM Elements
 const refreshBtn = document.getElementById('refresh-btn');
 const exportCsvBtn = document.getElementById('export-csv-btn');
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -55,11 +56,26 @@ if (progressCircle) {
 // -------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+    }
+    
     fetchReleaseNotes(false);
     setupEventListeners();
 });
 
 function setupEventListeners() {
+    // Theme Toggle Action
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+    }
+
     // Export Action
     if (exportCsvBtn) {
         exportCsvBtn.addEventListener('click', exportToCSV);
