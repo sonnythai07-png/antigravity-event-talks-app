@@ -9,6 +9,7 @@ let lastSyncedTime = null;
 
 // DOM Elements
 const refreshBtn = document.getElementById('refresh-btn');
+const exportCsvBtn = document.getElementById('export-csv-btn');
 const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -59,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
+    // Export Action
+    if (exportCsvBtn) {
+        exportCsvBtn.addEventListener('click', exportToCSV);
+    }
+
     // Refresh Actions
     refreshBtn.addEventListener('click', () => fetchReleaseNotes(true));
     retryBtn.addEventListener('click', () => fetchReleaseNotes(true));
@@ -349,7 +355,15 @@ function renderUpdatesList() {
         card.innerHTML = `
             <div class="card-header">
                 <span class="badge ${badgeClass}">${update.type}</span>
-                <span class="card-date">${update.date}</span>
+                <div class="flex-center" style="gap: 10px;">
+                    <span class="card-date">${update.date}</span>
+                    <button class="card-copy-btn flex-center" title="Copy update text">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 ${update.contentHtml}
@@ -360,6 +374,31 @@ function renderUpdatesList() {
                 </svg>
             </div>
         `;
+        
+        const copyBtn = card.querySelector('.card-copy-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Avoid selecting the card
+                const textToCopy = `[${update.date}] ${update.type}: ${update.contentText}`;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast('Copied update to clipboard!');
+                    
+                    // Simple visual feedback
+                    const origInner = copyBtn.innerHTML;
+                    copyBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    `;
+                    setTimeout(() => {
+                        copyBtn.innerHTML = origInner;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy card text:', err);
+                    showToast('Failed to copy text.');
+                });
+            });
+        }
         
         card.addEventListener('click', () => selectUpdate(update));
         releasesList.appendChild(card);
@@ -546,4 +585,41 @@ function showToast(message) {
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
+}
+
+function exportToCSV() {
+    if (filteredUpdates.length === 0) {
+        showToast('No updates to export.');
+        return;
+    }
+    
+    const headers = ['Date', 'Type', 'Content', 'Link'];
+    const csvRows = [headers.join(',')];
+    
+    filteredUpdates.forEach(update => {
+        const dateEscaped = `"${update.date.replace(/"/g, '""')}"`;
+        const typeEscaped = `"${update.type.replace(/"/g, '""')}"`;
+        const contentEscaped = `"${update.contentText.replace(/"/g, '""')}"`;
+        const linkEscaped = `"${update.link.replace(/"/g, '""')}"`;
+        
+        csvRows.push([dateEscaped, typeEscaped, contentEscaped, linkEscaped].join(','));
+    });
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    
+    const catStr = currentCategory !== 'all' ? `_${currentCategory}` : '';
+    const dateStr = new Date().toISOString().slice(0, 10);
+    link.setAttribute('download', `bigquery_releases_${dateStr}${catStr}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('CSV export downloaded!');
 }
