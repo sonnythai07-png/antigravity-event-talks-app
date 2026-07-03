@@ -41,6 +41,95 @@
     --radius-lg: 20px;
 }
 
+/* Light Theme Color Overrides */
+body.light-theme {
+    --bg-dark: hsl(220, 30%, 94%);
+    --bg-card: hsla(0, 0%, 100%, 0.75);
+    --bg-card-hover: hsla(0, 0%, 100%, 0.95);
+    --bg-card-selected: hsla(262, 83%, 94%, 0.5);
+    
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-highlight: rgba(0, 0, 0, 0.16);
+    
+    --text-primary: hsl(222, 47%, 12%);
+    --text-secondary: hsl(220, 16%, 38%);
+    --text-muted: hsl(220, 12%, 52%);
+    
+    --primary-glow: hsla(217, 89%, 61%, 0.15);
+    --secondary-glow: hsla(262, 83%, 58%, 0.15);
+}
+
+/* Light Theme Styling for Specific Elements */
+body.light-theme .app-header {
+    background: hsla(220, 30%, 94%, 0.8);
+}
+body.light-theme .feed-footer,
+body.light-theme .composer-actions {
+    background: hsla(220, 30%, 92%, 0.8);
+}
+body.light-theme .search-box input,
+body.light-theme .tweet-editor-container textarea {
+    background-color: hsla(0, 0%, 100%, 0.9);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+body.light-theme .search-box input:focus,
+body.light-theme .tweet-editor-container textarea:focus {
+    background-color: white;
+}
+body.light-theme .category-tabs,
+body.light-theme .sort-toggle-btn {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .selected-reference {
+    background: hsla(0, 0%, 100%, 0.4);
+}
+body.light-theme .card-body code {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: hsl(280, 50%, 30%);
+}
+
+/* Light Theme Twitter Mockup */
+body.light-theme .tweet-mockup {
+    background-color: white;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+body.light-theme .author-name {
+    color: #0f1419;
+}
+body.light-theme .mockup-text {
+    color: #0f1419;
+}
+body.light-theme .mockup-bold {
+    color: #0f1419;
+}
+body.light-theme .mockup-timestamp {
+    border-bottom-color: #eff3f4;
+}
+
+/* Theme Toggle Button Icon Display */
+body.light-theme .icon-moon {
+    display: none !important;
+}
+body.light-theme .icon-sun {
+    display: block !important;
+}
+
+/* Smooth Transitions for Theme Swapping */
+body, 
+.release-card, 
+.btn, 
+textarea, 
+input, 
+.app-header, 
+.feed-footer, 
+.composer-actions, 
+.tweet-mockup, 
+.search-box input, 
+.category-tabs, 
+.selected-reference {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
 /* Reset & Global Styles */
 * {
     box-sizing: border-box;
